@@ -4,6 +4,12 @@ module.exports = function(app){
 
     app.route('/auth/:userID/:passWord')
         .get(userList.listAllAccounts)
+    
+    app.route('/mainpage/m/:staffID')
+        .get(userList.listAllDataMobile)
+
+    app.route('/information/m/newdata/add')
+        .post(userList.CreateADataMobile)
 
     app.route('/map/getAllMap')
         .get(userList.listAllMap)

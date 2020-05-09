@@ -70,7 +70,7 @@ exports.listSomeMap = function(req, res){
 exports.listAllAccounts = function(req, res){
     let userid = req.params.userID
     let password = req.params.passWord
-    let sql = 'SELECT ac."userID", ac."passWord", st."staffName", st."staffType" FROM public."ACCOUNT" ac JOIN public."STAFF" st ON st."staffID" = ac."staffID" WHERE ac."userID" = '+ userid +' AND ac."passWord" = ' + password
+    let sql = 'SELECT ac."userID", ac."passWord", st."staffID", st."staffType" FROM public."ACCOUNT" ac JOIN public."STAFF" st ON st."staffID" = ac."staffID" WHERE ac."userID" = '+ userid +' AND ac."passWord" = ' + password
        
     //callback
     pool.query(sql,(error, results, fields)=>{
@@ -353,20 +353,57 @@ exports.listDashSubMostPrice = function(req, res){
         .catch(e => console.error(e.stack))
 }
 
-// exports.listSomeDist = function(req, res){
-//     let sql = 'SELECT * FROM public."DISTRICT" dt '
-//     //callback
-//     console.log(req.params.districtName)
-//     pool.query(sql,(error, results, fields)=>{
-//         if(error) {
-//             throw error
-//         }   
-//         res.json(results)
-//     })
+exports.listAllDataMobile = function(req, res){
+    let date = "'DD/MM/YYYY'"
+    let sql = 'SELECT re."projectID", re."staffID", re."projectName", to_char(re."inspectionDate", '+date +') as inspectionDate FROM public."REALESTATE" re JOIN public."STAFF" st ON st."staffID" = re."staffID"' 
+    + 'WHERE re."staffID" = ' + req.params.staffID + ' ORDER BY re."projectID" DESC;'
+    //callback
+    pool.query(sql,(error, results, fields)=>{
+        if(error) {
+            throw error
+        }   
+        res.json(results)
+    })
 
-//     // promise
-//     pool
-//         .query(sql)
-//         .then(res => console.log(res.rows[0]))
-//         .catch(e => console.error(e.stack))
-// }
+    // promise
+    pool
+        .query(sql)
+        .then(res => console.log(res.rows[0]))
+        .catch(e => console.error(e.stack))
+}
+
+exports.CreateADataMobile = function(req, res){
+    var datas = {}
+    datas = req.body
+    console.log("SSS",datas)
+    let sql1 = 'INSERT INTO public."REALESTATE"( "projectID", "staffID", "districtID", "subdistrictID", "roomCategory", "projectName", "latitude", "longtitude", "buildingName", "floor", "inspectionDate", "buildingFloor", "buildingAge", "buildingCondition", "buildingControlAct", "roomType", "roomPosition", "roomView", "materialDesign", units, "areaRoom", "camFee", "pricebyGov", "fireInsurance", "maintananceCondition")' 
+        + 'VALUES ((select max("projectID")+1 from public."REALESTATE"), ($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12), ($13), ($14), ($15), ($16), ($17), ($18), ($19), ($20), ($21), ($22), ($23), ($24));'
+    let sql2 = 'INSERT INTO public."FACILITY"( "projectID", "lobby", "lift", "swimmingPool", "fitness", "suana", "jacuzzi", "steam", "library", "kidplay", "garden", "parklot", "automateParklot", "golfCourse", "movieRoom", "shop")'
+        + 'VALUES ((select max("projectID")+1 from public."FACILITY"), ($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12), ($13), ($14), ($15));'
+    let sql3 = 'INSERT INTO public."TRANSPORT"( "projectID", "nearestBTS", "distanceFromBTS", "haveBTS", "haveMRT", "haveBRT")'
+        + 'VALUES ((select max("projectID")+1 from public."TRANSPORT"), ($1), ($2), ($3), ($4), ($5));'
+
+        //callback
+    pool.query(sql1,[datas.staffID, datas.districtID, datas.subdistrictID, datas.roomCategory, datas.projectName, datas.latitude, datas.longtitude, datas.buildingName, datas.floor, datas.inspectionDate, datas.buildingFloor, datas.buildingAge, datas.buildingCondition, datas.buildingControlAct, datas.roomType, datas.roomPosition, datas.roomView, datas.materialDesign, datas.units, datas.areaRoom, datas.camFee, datas.pricebyGov, datas.fireInsurance, datas.maintananceCondition], (error, results, fields)=>{
+        if(error) {
+            throw error
+        }   
+        // res.json(results)
+    })
+    pool.query(sql2,[datas.lobby, datas.lift, datas.swimmingPool, datas.fitness, datas.suana, datas.jacuzzi, datas.steam, datas.library, datas.kidplay, datas.garden, datas.parklot, datas.automateParklot, datas.golfCourse, datas.movieRoom, datas.shop],(error, results, fields)=>{
+        if(error) {
+            throw error
+        }   
+    })
+    pool.query(sql3,[datas.nearestBTS, datas.distanceFromBTS, datas.haveBTS, datas.haveMRT, datas.haveBRT],(error, results, fields)=>{
+        if(error) {
+            throw error
+        }   
+    })
+
+    // promise
+    pool
+        .query(sql1)
+        .then(res => console.log(res.rows[0]))
+        .catch(e => console.error(e.stack))
+}
