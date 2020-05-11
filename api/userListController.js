@@ -443,7 +443,10 @@ exports.predictData = function(req, res){
     })
 
     try {
-        var resp = await axios.post('http://localhost:5000/predict', { datas, bkk })
+        var resp = axios.post('http://localhost:5000/predict', { datas, bkk })      
+                        .then(response => {
+                            console.log(response.data.rows[0]);})
+
         var predictedPrice = resp.data.result
         console.log("1 ",predictedPrice)
     } catch (error) {
