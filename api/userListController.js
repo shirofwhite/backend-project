@@ -1,6 +1,6 @@
 const Sequelize = require('sequelize');
 // const database = require('../database');
-
+import axios from 'axios'
 const { Pool, Client } = require('pg')
 
 const pool = new Pool({
@@ -112,11 +112,11 @@ exports.updateAData = function(req, res){
     datas = req.body
     console.log("SSS",datas)
     
-    let sql1 = 'UPDATE public."REALESTATE"  SET "roomCategory" = ($1), "projectName" =  ($2), "latitude" = ($3), "longtitude" =  ($4), "buildingName" = ($5), "floor" = ($6), "buildingFloor" = ($7), "buildingAge" = ($8), "buildingCondition" = ($9), "buildingControlAct" = ($10), "roomType" = ($11), "roomPosition" = ($12), "roomView" = ($13), "materialDesign" = ($14), "units" = ($15), "areaRoom"= ($16), "camFee" = ($17), "pricebyGov" = ($18), "fireInsurance" = ($19), "maintananceCondition" = ($20), "marketPriceSQM" = ($21), "marketPrice" = ($22), "marketPriceClass" = ($23), "predictedPrice" = ($24) WHERE "projectID" = ($25);'
+    let sql1 = 'UPDATE public."REALESTATE"  SET "districtID" = ($1), "subdistrictID" = ($2), "roomCategory" = ($3), "projectName" =  ($4), "latitude" = ($5), "longtitude" =  ($6), "buildingName" = ($7), "floor" = ($8), "buildingFloor" = ($9), "buildingAge" = ($10), "buildingCondition" = ($11), "buildingControlAct" = ($12), "roomType" = ($13), "roomPosition" = ($14), "roomView" = ($15), "materialDesign" = ($16), "units" = ($17), "areaRoom"= ($18), "camFee" = ($19), "pricebyGov" = ($20), "fireInsurance" = ($21), "maintananceCondition" = ($22), "marketPriceSQM" = ($23), "marketPrice" = ($24), "marketPriceClass" = ($25), "predictedPrice" = ($26) WHERE "projectID" = ($27);'
     let sql2 = 'UPDATE public."FACILITY" SET lobby = ($1),  "lift" = ($2), "swimmingPool" = ($3), "fitness" = ($4), "suana" = ($5), "jacuzzi" = ($6), "steam" = ($7), "library" = ($8), "kidplay" = ($9), "garden" = ($10), "parklot" = ($11), "automateParklot" = ($12), "golfCourse" = ($13), "movieRoom" = ($14), "shop" = ($15) WHERE "projectID" = ($16);'
     let sql3 = 'UPDATE public."TRANSPORT" SET "nearestBTS" = ($1), "distanceFromBTS" = ($2), "haveBTS" = ($3), "haveMRT" = ($4), "haveBRT" = ($5) WHERE "projectID" = ($6);'
       console.log(req.params.districtName)
-    pool.query(sql1,[datas.roomCategory, datas.projectName, datas.latitude, datas.longtitude, datas.buildingName, datas.floor, datas.buildingFloor, datas.buildingAge, datas.buildingCondition, datas.buildingControlAct, datas.roomType, datas.roomPosition, datas.roomView, datas.materialDesign, datas.units, datas.areaRoom, datas.camFee, datas.pricebyGov, datas.fireInsurance, datas.maintananceCondition, datas.marketPriceSQM, datas.marketPrice, datas.marketPriceClass, datas.predictedPrice, req.params.projectID],(error, results, fields)=>{
+    pool.query(sql1,[datas.districtID, datas.subdistrictID, datas.roomCategory, datas.projectName, datas.latitude, datas.longtitude, datas.buildingName, datas.floor, datas.buildingFloor, datas.buildingAge, datas.buildingCondition, datas.buildingControlAct, datas.roomType, datas.roomPosition, datas.roomView, datas.materialDesign, datas.units, datas.areaRoom, datas.camFee, datas.pricebyGov, datas.fireInsurance, datas.maintananceCondition, datas.marketPriceSQM, datas.marketPrice, datas.marketPriceClass, datas.predictedPrice, req.params.projectID],(error, results, fields)=>{
         if(error) {
             throw error
         }   
@@ -353,9 +353,26 @@ exports.listDashSubMostPrice = function(req, res){
         .catch(e => console.error(e.stack))
 }
 
+exports.deleteAData = function(req, res){
+    let projectName = req.params.projectName
+    let sql = 'DELETE FROM public."REALESTATE" re WHERE re."projectName" = '+ projectName
+    pool.query(sql,(error, results, fields)=>{
+        if(error) {
+            throw error
+        }   
+        res.json(results)
+    })
+
+    // promise
+    pool
+        .query(sql)
+        .then(res => console.log(res.rows[0]))
+        .catch(e => console.error(e.stack))
+}
+
 exports.listAllDataMobile = function(req, res){
     let date = "'DD/MM/YYYY'"
-    let sql = 'SELECT re."projectID", re."staffID", re."projectName", to_char(re."inspectionDate", '+date +') as inspectionDate FROM public."REALESTATE" re JOIN public."STAFF" st ON st."staffID" = re."staffID"' 
+    let sql = 'SELECT re."projectID", re."staffID", re."projectName", re."buildingName", to_char(re."inspectionDate", '+date +') as inspectionDate FROM public."REALESTATE" re JOIN public."STAFF" st ON st."staffID" = re."staffID"' 
     + 'WHERE re."staffID" = ' + req.params.staffID + ' ORDER BY re."projectID" DESC;'
     //callback
     pool.query(sql,(error, results, fields)=>{
@@ -404,6 +421,57 @@ exports.CreateADataMobile = function(req, res){
     // promise
     pool
         .query(sql1)
+        .then(res => console.log(res.rows[0]))
+        .catch(e => console.error(e.stack))
+}
+
+exports.predictData = function(req, res){
+    var datas = {}
+    datas = req.body
+    console.log("SSS",datas)
+
+    let sql4 = 'UPDATE public."REALESTATE"  SET "predictedPrice" = ($1) WHERE "projectID" = ($2);'
+    let b = 'select dt."latCentreDistrict", dt."longCentreDistrict" from public."DISTRICT" dt'
+    
+    pool.query(b,(error, bkk, fields)=>{
+        if(error) {
+            throw error
+        }   
+        res.json(bkk)
+    })
+
+    try {
+        var resp = await axios.post('http://localhost:5000/predict', { datas, bkk })
+        var predictedPrice = resp.data.result
+        console.log("1 ",predictedPrice)
+    } catch (error) {
+        console.error(error)
+    }
+    console.log("2 ",predictedPrice)
+    pool.query(sql4,[predictedPrice, datas.projectID] , (error, results, fields)=>{
+        if(error) {
+            throw error
+        }   
+        // res.json(results)
+    })
+
+}
+
+exports.listSomeDataMobile = function(req, res){
+    let date = "'DD/MM/YYYY'"
+    let sql = 'SELECT re."projectID", re."roomCategory", re."projectName", re."latitude",  re."longtitude", re."buildingName", re."floor", st."staffName", to_char(re."inspectionDate", '+date +') as inspectionDate , sd."subdistrictID", sd."subdistrictName", dt."districtID", dt."districtName", dt."province", re."buildingFloor", re."buildingAge", re."buildingCondition",re."buildingControlAct", re."roomType", re."roomPosition", re."roomView",  re."materialDesign", re."units", re."areaRoom", re."camFee", re."pricebyGov", re."fireInsurance", re."maintananceCondition", fa."lobby", fa."lift", fa."swimmingPool", fa."fitness", fa."suana", fa."jacuzzi", fa."steam", fa."library", fa."garden", fa."kidplay", fa."parklot", fa."automateParklot", fa."golfCourse", fa."movieRoom", fa."shop", tp."nearestBTS", tp."distanceFromBTS", tp."haveBTS", tp."haveMRT", tp."haveBRT" FROM public."REALESTATE" re  JOIN public."STAFF" st ON st."staffID" = re."staffID"  JOIN public."DISTRICT" dt ON dt."districtID" = re."districtID" JOIN public."SUBDISTRICT" sd ON sd."subdistrictID" = re."subdistrictID" JOIN public."FACILITY" fa ON fa."projectID" = re."projectID" JOIN public."TRANSPORT" tp ON tp."projectID" = re."projectID" WHERE re."projectName" = ' + req.params.projectName
+    //callback
+    console.log(req.params.projectName)
+    pool.query(sql,(error, results, fields)=>{
+        if(error) {
+            throw error
+        }   
+        res.json(results)
+    })
+
+    // promise
+    pool
+        .query(sql)
         .then(res => console.log(res.rows[0]))
         .catch(e => console.error(e.stack))
 }

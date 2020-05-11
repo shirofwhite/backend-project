@@ -5,12 +5,19 @@ module.exports = function(app){
     app.route('/auth/:userID/:passWord')
         .get(userList.listAllAccounts)
     
+    // Mobile
     app.route('/mainpage/m/:staffID')
         .get(userList.listAllDataMobile)
 
     app.route('/information/m/newdata/add')
         .post(userList.CreateADataMobile)
 
+    app.route('/information/getData/m/:projectName')
+        .get(userList.listSomeDataMobile)
+
+    app.route('information/m/predict')
+        .post(userList.predictData)
+    // Web
     app.route('/map/getAllMap')
         .get(userList.listAllMap)
 
@@ -56,15 +63,14 @@ module.exports = function(app){
     app.route('/repositories/getAllData')
         .get(userList.listAllData)
     
-    // app.route('/repositories/delete')
-    //     .delete(userList.deleteAData)
+    app.route('/repositories/delete/:projectName')
+        .delete(userList.deleteAData)
     
     app.route('/information/getSomeData/:projectName')
         .get(userList.listSomeData)
     
     // app.route('/information/getSomeDist')
     //     .get(userList.listSomeDist)
-
 
     app.route('/information/update/:projectID')
         .post(userList.updateAData)
