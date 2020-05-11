@@ -1,6 +1,8 @@
 const Sequelize = require('sequelize');
 // const database = require('../database');
-import axios from 'axios'
+// import axios from "axios"
+const axios = require('axios');
+
 const { Pool, Client } = require('pg')
 
 const pool = new Pool({
