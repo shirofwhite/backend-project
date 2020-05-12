@@ -392,37 +392,71 @@ exports.listAllDataMobile = function(req, res){
 }
 
 exports.CreateADataMobile = function(req, res){
-    var datas = {}
-    datas = req.body
-    
+    // var datas = {}
+    // datas = req.body
+    var datas = {staffID: 2, districtID: 16, subdistrictID: 59,
+        roomCategory: 'ห้องชุดพักอาศัย', projectName: 'LC-63BF-0043.xlsx', latitude: 13.712209, longtitude: 100.584433, 
+        buildingName: 'Aspire Rama 4', floor: 8, inspectionDate: '2563-01-13', buildingFloor: 32, 
+        buildingAge: 7, buildingCondition: 2, buildingControlAct: 4, roomType: 1, roomPosition: 0, roomView: 0, 
+        materialDesign: 2, units: 1437, areaRoom: 28.03, camFee: 35, 
+         pricebyGov: 1657859,
+         fireInsurance: 24850, 
+        maintananceCondition: 1, lobby: 1, lift: 1, swimmingPool: 1, fitness: 1, suana: 0, jacuzzi: 0, 
+        steam: 0, library: 0, kidplay: 0, garden: 0, parklot: 1, automateParklot: 0, golfCourse: 0, movieRoom: 0, 
+        shop: 1, nearestBTS: 'BTS พระโขนง', distanceFromBTS: 990, haveBTS: 1 , haveMRT: 0, haveBRT: 0}
+    ;(async () => {
+        const client = await pool.connect()
+        try {
+          await client.query('BEGIN')
+          const sql1 = 'INSERT INTO public."REALESTATE"( "projectID", "staffID", "districtID", "subdistrictID", "roomCategory", "projectName", "latitude", "longtitude", "buildingName", "floor", "inspectionDate", "buildingFloor", "buildingAge", "buildingCondition", "buildingControlAct", "roomType", "roomPosition", "roomView", "materialDesign", units, "areaRoom", "camFee", "pricebyGov", "fireInsurance", "maintananceCondition")' 
+          + 'VALUES ((select max("projectID")+1 from public."REALESTATE"), ($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12), ($13), ($14), ($15), ($16), ($17), ($18), ($19), ($20), ($21), ($22), ($23), ($24) RETURNING projectID);'
+  
+        //   const queryText = 'INSERT INTO users(name) VALUES($1) RETURNING id'
+        //   const res = await client.query(queryText, ['brianc'])
+          const res = await client.query(sql1,[datas.staffID, datas.districtID, datas.subdistrictID, datas.roomCategory, datas.projectName, datas.latitude, datas.longtitude, datas.buildingName, datas.floor, datas.inspectionDate, datas.buildingFloor, datas.buildingAge, datas.buildingCondition, datas.buildingControlAct, datas.roomType, datas.roomPosition, datas.roomView, datas.materialDesign, datas.units, datas.areaRoom, datas.camFee, datas.pricebyGov, datas.fireInsurance, datas.maintananceCondition])
+        //   const insertPhotoText = 'INSERT INTO photos(user_id, photo_url) VALUES ($1, $2)'
+          const sql2 = 'INSERT INTO public."FACILITY"( "projectID", "lobby", "lift", "swimmingPool", "fitness", "suana", "jacuzzi", "steam", "library", "kidplay", "garden", "parklot", "automateParklot", "golfCourse", "movieRoom", "shop")'
+            + 'VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12), ($13), ($14), ($15), ($16));'
+        //   const insertPhotoValues = [res.rows[0].id, 's3.bucket.foo']
+          const insertFacility = [res.rows[0].projectID, datas.lobby, datas.lift, datas.swimmingPool, datas.fitness, datas.suana, datas.jacuzzi, datas.steam, datas.library, datas.kidplay, datas.garden, datas.parklot, datas.automateParklot, datas.golfCourse, datas.movieRoom, datas.shop]
+          await client.query(sql2, insertFacility)
+          const sql3 = 'INSERT INTO public."TRANSPORT"( "projectID", "nearestBTS", "distanceFromBTS", "haveBTS", "haveMRT", "haveBRT")'
+          + 'VALUES (($1), ($2), ($3), ($4), ($5), ($6));'
+          const insertTransport = [res.rows[0].projectID, datas.nearestBTS, datas.distanceFromBTS, datas.haveBTS, datas.haveMRT, datas.haveBRT]
+          await client.query(sql3, insertTransport)
+          await client.query('COMMIT')
+        } catch (e) {
+          await client.query('ROLLBACK')
+          throw e
+        } finally {
+          client.release()
+        }
+      })().catch(e => console.error(e.stack))
     console.log("SSS",datas)
-    let sql1 = 'INSERT INTO public."REALESTATE"( "projectID", "staffID", "districtID", "subdistrictID", "roomCategory", "projectName", "latitude", "longtitude", "buildingName", "floor", "inspectionDate", "buildingFloor", "buildingAge", "buildingCondition", "buildingControlAct", "roomType", "roomPosition", "roomView", "materialDesign", units, "areaRoom", "camFee", "pricebyGov", "fireInsurance", "maintananceCondition")' 
-        + 'VALUES ((select max("projectID")+1 from public."REALESTATE"), ($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12), ($13), ($14), ($15), ($16), ($17), ($18), ($19), ($20), ($21), ($22), ($23), ($24));'
-    let sql2 = 'INSERT INTO public."FACILITY"( "projectID", "lobby", "lift", "swimmingPool", "fitness", "suana", "jacuzzi", "steam", "library", "kidplay", "garden", "parklot", "automateParklot", "golfCourse", "movieRoom", "shop")'
-        + 'VALUES ((select max("projectID")+1 from public."FACILITY"), ($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12), ($13), ($14), ($15));'
-    let sql3 = 'INSERT INTO public."TRANSPORT"( "projectID", "nearestBTS", "distanceFromBTS", "haveBTS", "haveMRT", "haveBRT")'
-        + 'VALUES ((select max("projectID")+1 from public."TRANSPORT"), ($1), ($2), ($3), ($4), ($5));'
+    // let sql1 = 'INSERT INTO public."REALESTATE"( "projectID", "staffID", "districtID", "subdistrictID", "roomCategory", "projectName", "latitude", "longtitude", "buildingName", "floor", "inspectionDate", "buildingFloor", "buildingAge", "buildingCondition", "buildingControlAct", "roomType", "roomPosition", "roomView", "materialDesign", units, "areaRoom", "camFee", "pricebyGov", "fireInsurance", "maintananceCondition")' 
+    //     + 'VALUES ((select max("projectID")+1 from public."REALESTATE"), ($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12), ($13), ($14), ($15), ($16), ($17), ($18), ($19), ($20), ($21), ($22), ($23), ($24));'
+    // let sql2 = 'INSERT INTO public."FACILITY"( "projectID", "lobby", "lift", "swimmingPool", "fitness", "suana", "jacuzzi", "steam", "library", "kidplay", "garden", "parklot", "automateParklot", "golfCourse", "movieRoom", "shop")'
+    //     + 'VALUES ((select max("projectID")+1 from public."FACILITY"), ($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12), ($13), ($14), ($15));'
+    // let sql3 = 'INSERT INTO public."TRANSPORT"( "projectID", "nearestBTS", "distanceFromBTS", "haveBTS", "haveMRT", "haveBRT")'
+    //     + 'VALUES ((select max("projectID")+1 from public."TRANSPORT"), ($1), ($2), ($3), ($4), ($5));'
 
         //callback
-    ;(async () => {
-        pool.query(sql1,[datas.staffID, datas.districtID, datas.subdistrictID, datas.roomCategory, datas.projectName, datas.latitude, datas.longtitude, datas.buildingName, datas.floor, datas.inspectionDate, datas.buildingFloor, datas.buildingAge, datas.buildingCondition, datas.buildingControlAct, datas.roomType, datas.roomPosition, datas.roomView, datas.materialDesign, datas.units, datas.areaRoom, datas.camFee, datas.pricebyGov, datas.fireInsurance, datas.maintananceCondition], (error, results, fields)=>{
-        if(error) {
-            throw error
-        }   
-        // res.json(results)
-    })
-    await pool.end()
-        await pool.query(sql2,[datas.lobby, datas.lift, datas.swimmingPool, datas.fitness, datas.suana, datas.jacuzzi, datas.steam, datas.library, datas.kidplay, datas.garden, datas.parklot, datas.automateParklot, datas.golfCourse, datas.movieRoom, datas.shop],(error, results, fields)=>{
-        if(error) {
-            throw error
-        }   
-    })
-        await pool.query(sql3,[datas.nearestBTS, datas.distanceFromBTS, datas.haveBTS, datas.haveMRT, datas.haveBRT],(error, results, fields)=>{
-        if(error) {
-            throw error
-        }   
-    })
-})()
+    // pool.query(sql1,[datas.staffID, datas.districtID, datas.subdistrictID, datas.roomCategory, datas.projectName, datas.latitude, datas.longtitude, datas.buildingName, datas.floor, datas.inspectionDate, datas.buildingFloor, datas.buildingAge, datas.buildingCondition, datas.buildingControlAct, datas.roomType, datas.roomPosition, datas.roomView, datas.materialDesign, datas.units, datas.areaRoom, datas.camFee, datas.pricebyGov, datas.fireInsurance, datas.maintananceCondition], (error, results, fields)=>{
+    //     if(error) {
+    //         throw error
+    //     }   
+    //     // res.json(results)
+    // })
+    // pool.query(sql2,[datas.lobby, datas.lift, datas.swimmingPool, datas.fitness, datas.suana, datas.jacuzzi, datas.steam, datas.library, datas.kidplay, datas.garden, datas.parklot, datas.automateParklot, datas.golfCourse, datas.movieRoom, datas.shop],(error, results, fields)=>{
+    //     if(error) {
+    //         throw error
+    //     }   
+    // })
+    // pool.query(sql3,[datas.nearestBTS, datas.distanceFromBTS, datas.haveBTS, datas.haveMRT, datas.haveBRT],(error, results, fields)=>{
+    //     if(error) {
+    //         throw error
+    //     }   
+    // })
 
     // promise
     // pool
