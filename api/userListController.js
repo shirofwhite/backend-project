@@ -394,7 +394,7 @@ exports.listAllDataMobile = function(req, res){
 exports.CreateADataMobile = function(req, res){
     // var datas = {}
     // datas = req.body
-    var datas = {projectID : 1188, staffID: 2, districtID: 16, subdistrictID: 59,
+    var datas = {staffID: 2, districtID: 16, subdistrictID: 59,
         roomCategory: 'ห้องชุดพักอาศัย', projectName: 'LC-63BF-0043.xlsx', latitude: 13.712209, longtitude: 100.584433, 
         buildingName: 'Aspire Rama 4', floor: 8, inspectionDate: '2563-01-13', buildingFloor: 32, 
         buildingAge: 7, buildingCondition: 2, buildingControlAct: 4, roomType: 1, roomPosition: 0, roomView: 0, 
