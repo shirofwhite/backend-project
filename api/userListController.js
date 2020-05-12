@@ -407,10 +407,10 @@ exports.CreateADataMobile = function(req, res){
     console.log("SSS",datas)
     let sql1 = 'INSERT INTO public."REALESTATE"( "projectID", "staffID", "districtID", "subdistrictID", "roomCategory", "projectName", "latitude", "longtitude", "buildingName", "floor", "inspectionDate", "buildingFloor", "buildingAge", "buildingCondition", "buildingControlAct", "roomType", "roomPosition", "roomView", "materialDesign", units, "areaRoom", "camFee", "pricebyGov", "fireInsurance", "maintananceCondition")' 
         + 'VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12), ($13), ($14), ($15), ($16), ($17), ($18), ($19), ($20), ($21), ($22), ($23), ($24), ($25));'
-    let sql2 = 'INSERT INTO public."FACILITY"( "projectID", "lobby", "lift", "swimmingPool", "fitness", "suana", "jacuzzi", "steam", "library", "kidplay", "garden", "parklot", "automateParklot", "golfCourse", "movieRoom", "shop")'
-        + 'VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12), ($13), ($14), ($15), ($16));'
-    let sql3 = 'INSERT INTO public."TRANSPORT"( "projectID", "nearestBTS", "distanceFromBTS", "haveBTS", "haveMRT", "haveBRT")'
-        + 'VALUES (($1), ($2), ($3), ($4), ($5), ($6));'
+    let sql2 = 'INSERT INTO public."FACILITY"( "lobby", "lift", "swimmingPool", "fitness", "suana", "jacuzzi", "steam", "library", "kidplay", "garden", "parklot", "automateParklot", "golfCourse", "movieRoom", "shop")'
+        + 'VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12), ($13), ($14), ($15), ;'
+    let sql3 = 'INSERT INTO public."TRANSPORT"( "nearestBTS", "distanceFromBTS", "haveBTS", "haveMRT", "haveBRT")'
+        + 'VALUES (($1), ($2), ($3), ($4), ($5);'
 
         //callback
     pool.query(sql1,[ datas.projectID,datas.staffID, datas.districtID, datas.subdistrictID, datas.roomCategory, datas.projectName, datas.latitude, datas.longtitude, datas.buildingName, datas.floor, datas.inspectionDate, datas.buildingFloor, datas.buildingAge, datas.buildingCondition, datas.buildingControlAct, datas.roomType, datas.roomPosition, datas.roomView, datas.materialDesign, datas.units, datas.areaRoom, datas.camFee, datas.pricebyGov, datas.fireInsurance, datas.maintananceCondition], (error, results, fields)=>{
