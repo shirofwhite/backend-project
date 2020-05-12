@@ -392,8 +392,18 @@ exports.listAllDataMobile = function(req, res){
 }
 
 exports.CreateADataMobile = function(req, res){
-    var datas = {}
-    datas = req.body
+    // var datas = {}
+    // datas = req.body
+    var datas = {projectID : 1188, staffID: 2, districtID: 16, subdistrictID: 59,
+        roomCategory: 'ห้องชุดพักอาศัย', projectName: 'LC-63BF-0043.xlsx', latitude: 13.712209, longtitude: 100.584433, 
+        buildingName: 'Aspire Rama 4', floor: 8, inspectionDate: '2563-01-13', buildingFloor: 32, 
+        buildingAge: 7, buildingCondition: 2, buildingControlAct: 4, roomType: 1, roomPosition: 0, roomView: 0, 
+        materialDesign: 2, units: 1437, areaRoom: 28.03, camFee: 35, 
+         pricebyGov: 1657859,
+         fireInsurance: 24850, 
+        maintananceCondition: 1, lobby: 1, lift: 1, swimmingPool: 1, fitness: 1, suana: 0, jacuzzi: 0, 
+        steam: 0, library: 0, kidplay: 0, garden: 0, parklot: 1, automateParklot: 0, golfCourse: 0, movieRoom: 0, 
+        shop: 1, nearestBTS: 'BTS พระโขนง', distanceFromBTS: 990, haveBTS: 1 , haveMRT: 0, haveBRT: 0}
     console.log("SSS",datas)
     let sql1 = 'INSERT INTO public."REALESTATE"( "projectID", "staffID", "districtID", "subdistrictID", "roomCategory", "projectName", "latitude", "longtitude", "buildingName", "floor", "inspectionDate", "buildingFloor", "buildingAge", "buildingCondition", "buildingControlAct", "roomType", "roomPosition", "roomView", "materialDesign", units, "areaRoom", "camFee", "pricebyGov", "fireInsurance", "maintananceCondition")' 
         + 'VALUES ((select max("projectID")+1 from public."REALESTATE"), ($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12), ($13), ($14), ($15), ($16), ($17), ($18), ($19), ($20), ($21), ($22), ($23), ($24));'
