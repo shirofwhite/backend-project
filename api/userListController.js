@@ -399,20 +399,20 @@ exports.CreateADataMobile = function(req, res){
         console.log("SSS",datas)
         try {
           await client.query('BEGIN')
-          const sql1 = 'INSERT INTO public."REALESTATE"( "projectID", "staffID", "districtID", "subdistrictID", "roomCategory", "projectName", "latitude", "longtitude", "buildingName", "floor", "inspectionDate", "buildingFloor", "buildingAge", "buildingCondition", "buildingControlAct", "roomType", "roomPosition", "roomView", "materialDesign", units, "areaRoom", "camFee", "pricebyGov", "fireInsurance", "maintananceCondition")' 
+          const sql1 = 'INSERT INTO public."REALESTATE"( "projectID", "staffID", "districtID", "subdistrictID", "roomCategory", "projectName", "latitude", "longtitude", "buildingName", "floor", "inspectionDate", "buildingFloor", "buildingAge", "buildingCondition", "buildingControlAct", "roomType", "roomPosition", "roomView", "materialDesign", "units", "areaRoom", "camFee", "pricebyGov", "fireInsurance", "maintananceCondition")' 
           + 'VALUES ((select max("projectID")+1 from public."REALESTATE"), ($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12), ($13), ($14), ($15), '
-          + '($16), ($17), ($18), ($19), ($20), ($21), ($22), ($23), ($24) RETURNING *);'
+          + '($16), ($17), ($18), ($19), ($20), ($21), ($22), ($23), ($24) );'
           const res = await client.query(sql1,[datas.staffID, datas.districtID, datas.subdistrictID, datas.roomCategory, datas.projectName, datas.latitude, datas.longtitude, datas.buildingName, datas.floor, datas.inspectionDate, datas.buildingFloor, datas.buildingAge, datas.buildingCondition, datas.buildingControlAct, datas.roomType, datas.roomPosition, datas.roomView, datas.materialDesign, datas.units, datas.areaRoom, datas.camFee, datas.pricebyGov, datas.fireInsurance, datas.maintananceCondition])
         //   console.log('1',res.rows[0].projectID)
           
           const sql2 = 'INSERT INTO public."FACILITY"( "projectID", "lobby", "lift", "swimmingPool", "fitness", "suana", "jacuzzi", "steam", "library", "kidplay", "garden", "parklot", "automateParklot", "golfCourse", "movieRoom", "shop")'
-          + 'VALUES ((select max("projectID")+1 from public."FACILITY"), ($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12), ($13), ($14), ($15);'
+          + 'VALUES ((select max("projectID")+1 from public."FACILITY"), ($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12), ($13), ($14), ($15));'
           const insertFacility = [datas.lobby, datas.lift, datas.swimmingPool, datas.fitness, datas.suana, datas.jacuzzi, datas.steam, datas.library, datas.kidplay, datas.garden, datas.parklot, datas.automateParklot, datas.golfCourse, datas.movieRoom, datas.shop]
           await client.query(sql2, insertFacility)
         //   console.log('2',res.rows[0].projectID)
          
           const sql3 = 'INSERT INTO public."TRANSPORT"( "projectID", "nearestBTS", "distanceFromBTS", "haveBTS", "haveMRT", "haveBRT")'
-          + 'VALUES ((select max("projectID")+1 from public."TRANSPORT"), ($1), ($2), ($3), ($4), ($5);'
+          + 'VALUES ((select max("projectID")+1 from public."TRANSPORT"), ($1), ($2), ($3), ($4), ($5));'
           const insertTransport = [datas.nearestBTS, datas.distanceFromBTS, datas.haveBTS, datas.haveMRT, datas.haveBRT]
           await client.query(sql3, insertTransport)
         //   console.log('3',res.rows[0].projectID)
